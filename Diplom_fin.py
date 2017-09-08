@@ -4,7 +4,8 @@ import time
 import sys
 import os.path
 
-from diplom.data.requests_data import get_user_id, get_group_members, get_user_friends, get_user_group
+
+from data.requests_data import get_user_friends, get_user_group, get_user_id, get_group_members
 
 
 DIR_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -52,7 +53,12 @@ def main():
     sleep_inform('запрос, ищу друзей пользователя')
 
     data_groups = get_user_group(data_id)
-    data_groups_id = [id['id'] for id in data_groups['response']['items']]
+    data_groups_id = []
+    for group in data_groups['response']['items']:
+        if "deactivated" in group:
+            continue
+        else:
+            data_groups_id.append(group['id'])
     sleep_inform('запрос, ищу группы пользователя')
 
     group_wout_fr = []

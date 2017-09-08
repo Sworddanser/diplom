@@ -1,5 +1,7 @@
+# coding=utf-8
 import requests
-from diplom.data.config_information.information import VERSION, ACCESS_TOKEN,SCREEN_NAME, USER_ID
+from data.config_information.information import VERSION, ACCESS_TOKEN,SCREEN_NAME, USER_ID
+
 
 # APP_ID = 6119344
 # AUTHORIZE_URL = 'https://oauth.vk.com/authorize'
@@ -15,6 +17,7 @@ from diplom.data.config_information.information import VERSION, ACCESS_TOKEN,SCR
 # print(urlencode(auth_data))
 #
 # print('?'.join((AUTHORIZE_URL, urlencode(auth_data))))
+
 
 
 def get_user_id():
@@ -38,6 +41,23 @@ def get_user_id():
         data_id_user = response.json()
         data_id = data_id_user['response']['object_id']
     return data_id
+
+
+def get_group_members(group_id, user_ids):
+    params = {
+        'access_token': ACCESS_TOKEN,
+        'v': VERSION,
+        'group_id': group_id,
+        'user_ids': '{user_ids}'.format(user_ids=user_ids),
+        'extended': 0,
+    }
+    try:
+        response = requests.get('https://api.vk.com/method/groups.isMember', params)
+    except requests.exceptions.ReadTimeout:
+        print('Cловили Read timeout occured')
+        response = requests.get('https://api.vk.com/method/groups.isMember', params, timeout=10)
+    data_group_members = response.json()
+    return data_group_members
 
 
 def get_user_friends(data_id):
@@ -71,21 +91,3 @@ def get_user_group(data_id):
         response = requests.get('https://api.vk.com/method/groups.get', params, timeout=10)
     data_groups = response.json()
     return data_groups
-
-
-def get_group_members(group_id,user_ids):
-    params = {
-        'access_token': ACCESS_TOKEN,
-        'v': VERSION,
-        'group_id': group_id,
-        'user_ids': '{user_ids}'.format(user_ids=user_ids),
-        'extended': 0,
-    }
-    try:
-        response = requests.get('https://api.vk.com/method/groups.isMember', params)
-    except requests.exceptions.ReadTimeout:
-        print('Cловили Read timeout occured')
-        response = requests.get('https://api.vk.com/method/groups.get', params, timeout=10)
-    data_group_members = response.json()
-    return data_group_members
-
